@@ -120,9 +120,9 @@ class SistemaBancario {
         Loja loja1 = new Loja(contaLoja1, 2);
         Loja loja2 = new Loja(contaLoja2, 2);
 
-        // Inicializa as threads dos clientes
+        // Inicializa as threads dos clientes com saldo inicial de 1000
         for (int i = 0; i < 5; i++) {
-            Cliente cliente = new Cliente(new Conta(1000));
+            Cliente cliente = new Cliente(new Conta(1000)); // Inicializa a conta do cliente com 1000
             cliente.start();
         }
 
@@ -135,4 +135,5 @@ class SistemaBancario {
         }
     }
 }
+
 
