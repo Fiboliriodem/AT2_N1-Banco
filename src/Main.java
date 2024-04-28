@@ -109,7 +109,7 @@ class Banco {
     }
 }
 
-public class SistemaBancario {
+class SistemaBancario {
     public static void main(String[] args) {
         Conta contaBanco = new Conta(0);
         Banco banco = new Banco(contaBanco);
