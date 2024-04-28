@@ -7,3 +7,5 @@ Ferramentas de Desenvolvimento: IntelliJ
 
 Sobre o Autor
 O autor desse projeto feito nas metades foi Felipe Vasconcelos Cardoso
+
+OBS> devido a atritos com o intelliJ, apenas parte dos commits foram realmente entregues
