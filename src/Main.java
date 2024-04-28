@@ -53,15 +53,18 @@ class Cliente extends Thread {
         while (true) {
             try {
                 double valorCompra = Math.random() < 0.5 ? 100 : 200;
-                conta.sacar(valorCompra);
-                // Simulação de compra na loja
-                Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
+                if (conta.getSaldo() >= valorCompra) {
+                    conta.sacar(valorCompra);
+                    // Simulação de compra na loja
+                    Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
+                }
             } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
                 e.printStackTrace();
             }
         }
     }
 }
+
 
 class Funcionario extends Thread {
     private Conta salario;
