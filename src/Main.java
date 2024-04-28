@@ -50,20 +50,24 @@ class Cliente extends Thread {
     }
 
     public void run() {
-        while (true) {
-            try {
+        try {
+            double saldoAtual = conta.getSaldo();
+            while (saldoAtual > 0) {
                 double valorCompra = Math.random() < 0.5 ? 100 : 200;
-                if (conta.getSaldo() >= valorCompra) {
+                if (saldoAtual >= valorCompra) {
                     conta.sacar(valorCompra);
+                    saldoAtual -= valorCompra;
                     // Simulação de compra na loja
                     Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
                 }
-            } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
-                e.printStackTrace();
+                saldoAtual = conta.getSaldo();
             }
+        } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
+            e.printStackTrace();
         }
     }
 }
+
 
 
 class Funcionario extends Thread {
