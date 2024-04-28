@@ -22,19 +22,24 @@ class Conta {
         }
     }
 
-    public void sacar(double valor) {
+    public void sacar(double valor) throws SaldoInsuficienteException {
         lock.lock();
         try {
             if (saldo >= valor) {
                 saldo -= valor;
             } else {
-                System.out.println("Saldo insuficiente.");
+                throw new SaldoInsuficienteException("Saldo insuficiente para saque.");
             }
         } finally {
             lock.unlock();
         }
     }
 
+    class SaldoInsuficienteException extends Exception {
+        public SaldoInsuficienteException(String mensagem) {
+            super(mensagem);
+        }
+    }
 }
 
 class Cliente extends Thread {
@@ -47,11 +52,11 @@ class Cliente extends Thread {
     public void run() {
         while (conta.getSaldo() > 0) {
             double valorCompra = Math.random() < 0.5 ? 100 : 200;
-            conta.sacar(valorCompra);
-            // Simulação de compra na loja
             try {
+                conta.sacar(valorCompra);
+                // Simulação de compra na loja
                 Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
                 e.printStackTrace();
             }
         }
@@ -71,8 +76,12 @@ class Funcionario extends Thread {
         while (true) {
             salario.depositar(1400); // Recebe o salário
             double valorInvestimento = 1400 * 0.2;
-            salario.sacar(valorInvestimento); // Investe 20% do salário
-            investimento.depositar(valorInvestimento);
+            try {
+                salario.sacar(valorInvestimento); // Investe 20% do salário
+                investimento.depositar(valorInvestimento);
+            } catch (Conta.SaldoInsuficienteException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
@@ -98,13 +107,7 @@ class Loja {
 }
 
 class Banco {
-    private Conta contaBanco;
-
-    public Banco(Conta contaBanco) {
-        this.contaBanco = contaBanco;
-    }
-
-    public synchronized void transferencia(Conta origem, Conta destino, double valor) {
+    public void transferencia(Conta origem, Conta destino, double valor) throws Conta.SaldoInsuficienteException {
         origem.sacar(valor);
         destino.depositar(valor);
     }
@@ -113,7 +116,7 @@ class Banco {
 class SistemaBancario {
     public static void main(String[] args) {
         Conta contaBanco = new Conta(0);
-        Banco banco = new Banco(contaBanco);
+        Banco banco = new Banco();
 
         Conta contaLoja1 = new Conta(0);
         Conta contaLoja2 = new Conta(0);
@@ -129,12 +132,15 @@ class SistemaBancario {
 
         // Simulação de transações entre lojas e banco
         while (true) {
-            banco.transferencia(contaLoja1, contaBanco, 1400); // Transfere o valor do salário da loja 1 para o banco
-            contaLoja1.sacar(1400); // Paga os salários dos funcionários da loja 1
-            banco.transferencia(contaLoja2, contaBanco, 1400); // Transfere o valor do salário da loja 2 para o banco
-            contaLoja2.sacar(1400); // Paga os salários dos funcionários da loja 2
+            try {
+                banco.transferencia(contaLoja1, contaBanco, 1400); // Transfere o valor do salário da loja 1 para o banco
+                contaLoja1.sacar(1400); // Paga os salários dos funcionários da loja 1
+                banco.transferencia(contaLoja2, contaBanco, 1400); // Transfere o valor do salário da loja 2 para o banco
+                contaLoja2.sacar(1400); // Paga os salários dos funcionários da loja 2
+            } catch (Conta.SaldoInsuficienteException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
-
 
