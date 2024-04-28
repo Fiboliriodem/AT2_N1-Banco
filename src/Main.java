@@ -54,14 +54,15 @@ class Cliente extends Thread {
         try {
             for (int i = 0; i < NUMERO_COMPRAS; i++) {
                 double valorCompra = Math.random() < 0.5 ? 100 : 200;
-                if (conta.getSaldo() >= valorCompra) {
-                    conta.sacar(valorCompra);
-                    // Simulação de compra na loja
-                    System.out.println("Cliente realizou uma compra de $" + valorCompra);
-                    Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
-                } else {
-                    System.out.println("Cliente não possui saldo suficiente para realizar a compra de $" + valorCompra);
+                synchronized (conta) {
+                    if (conta.getSaldo() >= valorCompra) {
+                        conta.sacar(valorCompra);
+                        System.out.println("Cliente realizou uma compra de $" + valorCompra);
+                    } else {
+                        System.out.println("Cliente não possui saldo suficiente para realizar a compra de $" + valorCompra);
+                    }
                 }
+                Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
             }
         } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
             e.printStackTrace();
@@ -156,6 +157,7 @@ class SistemaBancario {
         }
     }
 }
+
 
 
 
