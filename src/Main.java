@@ -50,9 +50,9 @@ class Cliente extends Thread {
     }
 
     public void run() {
-        while (conta.getSaldo() > 0) {
-            double valorCompra = Math.random() < 0.5 ? 100 : 200;
+        while (true) {
             try {
+                double valorCompra = Math.random() < 0.5 ? 100 : 200;
                 conta.sacar(valorCompra);
                 // Simulação de compra na loja
                 Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
