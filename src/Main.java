@@ -51,24 +51,17 @@ class Cliente extends Thread {
 
     public void run() {
         try {
-            double saldoAtual = conta.getSaldo();
-            while (saldoAtual > 0) {
+            while (true) {
                 double valorCompra = Math.random() < 0.5 ? 100 : 200;
-                if (saldoAtual >= valorCompra) {
-                    conta.sacar(valorCompra);
-                    saldoAtual -= valorCompra;
-                    // Simulação de compra na loja
-                    Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
-                }
-                saldoAtual = conta.getSaldo();
+                conta.sacar(valorCompra);
+                // Simulação de compra na loja
+                Thread.sleep((long) (Math.random() * 1000)); // Tempo de compra simulado
             }
         } catch (InterruptedException | Conta.SaldoInsuficienteException e) {
             e.printStackTrace();
         }
     }
 }
-
-
 
 class Funcionario extends Thread {
     private Conta salario;
@@ -114,9 +107,16 @@ class Loja {
 }
 
 class Banco {
+    private final Lock lock = new ReentrantLock();
+
     public void transferencia(Conta origem, Conta destino, double valor) throws Conta.SaldoInsuficienteException {
-        origem.sacar(valor);
-        destino.depositar(valor);
+        lock.lock();
+        try {
+            origem.sacar(valor);
+            destino.depositar(valor);
+        } finally {
+            lock.unlock();
+        }
     }
 }
 
@@ -150,4 +150,5 @@ class SistemaBancario {
         }
     }
 }
+
 
